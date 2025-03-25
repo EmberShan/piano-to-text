@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #8D8D8D #DDDBDB; /* Replace with your desired colors */
+}
