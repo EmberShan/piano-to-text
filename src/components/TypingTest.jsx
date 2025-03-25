@@ -32,7 +32,7 @@ export default function TypingTest({
 
     // Start from current word index and measure cumulative width
     let cumulativeWidth = 0;
-    let startIndex = Math.max(0, currentWordIndex - 3); // Keep a few previous words
+    let startIndex = Math.max(0, currentWordIndex - 6); // Keep a few previous words
     let endIndex = startIndex;
 
     // Create a temporary span to measure word widths
