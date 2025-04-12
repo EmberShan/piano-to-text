@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import TypingTest from "./components/TypingTest";
+import MIDIListener from "./components/MIDIListener";
 
 const passage = `Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do: once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it, "and what is the use of a book," thought Alice "without pictures or conversations?"
 
@@ -107,7 +108,7 @@ export default function App() {
         placeholder="Type here..."
       />
 
-      <div className="flex">
+      {/* <div className="flex">
         {["w", "x", "y", "z", "v"].map((char, index) => (
           <button
             key={index}
@@ -115,7 +116,9 @@ export default function App() {
             className="w-[10vw] h-[40vh] bg-white border border-black mr-1 last:mr-0 active:bg-gray-300"
           />
         ))}
-      </div>
+      </div> */}
+
+      <MIDIListener />
     </div>
   );
 }
