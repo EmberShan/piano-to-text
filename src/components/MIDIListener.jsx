@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { getMappedCharacter, matchChord } from "../utils/midiMapping";
 
-function MIDIListener() {
-  const [lastNote, setLastNote] = useState(null);
-  const [lastLetter, setLastLetter] = useState(null);
+function MIDIListener({ onMIDIInput }) {
   const [listening, setListening] = useState(false);
+  const activeNotes = useRef(new Set());
 
   const startMIDI = () => {
     navigator
@@ -21,21 +21,42 @@ function MIDIListener() {
 
   function handleMIDIMessage(message) {
     const [status, note, velocity] = message.data;
-    if (status === 144 && velocity > 0) {
-      const letter = mapNoteToLetter(note);
-      setLastNote(note);
-      setLastLetter(letter);
-      console.log(`Note: ${note}, You played: ${letter}`);
+    
+    if (status === 144 && velocity > 0) { // Note On
+      activeNotes.current.add(note);
+      
+      // Check for chord when we have exactly 4 notes
+      if (activeNotes.current.size === 4) {
+        const chordResult = matchChord(Array.from(activeNotes.current));
+        if (chordResult === " ") {
+          onMIDIInput("check_word");
+          activeNotes.current.clear();
+          return;
+        }
+      }
+      
+      // Handle special keys and regular characters
+      const character = getMappedCharacter(note);
+      if (character) {
+        console.log('MIDI Input:', { note, character }); // Debug log
+        if (character === "space") {
+          // Send a special signal to check the word first
+          onMIDIInput("check_word");
+        } else if (character === "backspace") {
+          // Simulate backspace key press
+          onMIDIInput("\b");
+        } else {
+          // Regular character - send the character directly
+          onMIDIInput(character);
+        }
+      }
+    } else if (status === 128 || (status === 144 && velocity === 0)) { // Note Off
+      activeNotes.current.delete(note);
     }
   }
 
-  function mapNoteToLetter(note) {
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    return alphabet[(note - 21) % 26];
-  }
-
   return (
-    <div className="text-white p-20">
+    <div className="text-white p-4">
       {!listening ? (
         <button
           onClick={startMIDI}
@@ -44,18 +65,10 @@ function MIDIListener() {
           Enable MIDI
         </button>
       ) : (
-        <>
-          <h1 className="text-2xl mb-4">Listening to MIDI input...</h1>
-          {lastNote !== null && (
-            <div className="mt-4 text-xl">
-              <p><strong>Note:</strong> {lastNote}</p>
-              <p><strong>Mapped Letter:</strong> {lastLetter}</p>
-            </div>
-          )}
-        </>
+        <h1 className="text-2xl">MIDI Input Active</h1>
       )}
     </div>
   );
 }
 
-export default MIDIListener;
+export default MIDIListener; 

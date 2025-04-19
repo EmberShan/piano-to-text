@@ -7,6 +7,7 @@ export default function TypingTest({
   timeLeft,
   wpm,
   resetTest,
+  currentInput,
 }) {
   const containerRef = useRef(null);
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 0 });
@@ -64,6 +65,48 @@ export default function TypingTest({
     setVisibleRange({ start: startIndex, end: endIndex + 1 });
   }, [currentWordIndex, words, containerWidth]);
 
+  const renderWord = (word, index) => {
+    const isCurrentWord = index === currentWordIndex;
+    const isTyped = index < currentWordIndex;
+    const typedWord = typedWords[index];
+
+    if (isTyped) {
+      return (
+        <span
+          key={index}
+          className={`mr-2 ${typedWord.correct ? "text-green-500" : "text-red-500"}`}
+        >
+          {word}
+        </span>
+      );
+    }
+
+    if (isCurrentWord) {
+      return (
+        <span key={index} className="mr-2">
+          {word.split("").map((letter, letterIndex) => {
+            const isTyped = letterIndex < currentInput.length;
+            const isCorrect = isTyped && letter.toLowerCase() === currentInput[letterIndex].toLowerCase();
+            return (
+              <span
+                key={letterIndex}
+                className={`${isTyped ? (isCorrect ? "text-green-500" : "text-red-500") : "text-gray-400"}`}
+              >
+                {letter}
+              </span>
+            );
+          })}
+        </span>
+      );
+    }
+
+    return (
+      <span key={index} className="text-gray-400 mr-2">
+        {word}
+      </span>
+    );
+  };
+
   return (
     <div
       ref={containerRef}
@@ -72,7 +115,6 @@ export default function TypingTest({
     >
       <div className="flex flex-row justify-between items-center w-full space-x-4">
         <div className="text-xl font-semibold">Time Left: {timeLeft}s</div>
-
         <button
           onClick={resetTest}
           className="px-4 py-2 bg-transparent border border-white text-white rounded mt-2 hover:bg-gray-700 cursor-pointer"
@@ -85,30 +127,12 @@ export default function TypingTest({
       <div className="w-full border-t border-gray-700 my-4"></div>
 
       <div className="text-gray-400">
-        Type the following words (use space to move to the next word): 
+        Type the following words (use space to move to the next word):
       </div>
       <div className="text-2xl overflow-hidden whitespace-nowrap">
         {words
           .slice(visibleRange.start, visibleRange.end)
-          .map((word, index) => {
-            const actualIndex = index + visibleRange.start;
-            return (
-              <span
-                key={actualIndex}
-                className={`mr-2 ${
-                  actualIndex < typedWords.length
-                    ? typedWords[actualIndex].correct
-                      ? "text-green-500"
-                      : "text-red-500"
-                    : actualIndex === currentWordIndex
-                    ? "bg-green-900"
-                    : "text-gray-400"
-                }`}
-              >
-                {word}
-              </span>
-            );
-          })}
+          .map((word, index) => renderWord(word, index + visibleRange.start))}
       </div>
     </div>
   );
