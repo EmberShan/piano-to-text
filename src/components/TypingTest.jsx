@@ -126,9 +126,9 @@ export default function TypingTest({
 
       <div className="w-full border-t border-gray-700 my-4"></div>
 
-      <div className="text-gray-400">
+      {/* <div className="text-gray-400">
         Type the following words (use space to move to the next word):
-      </div>
+      </div> */}
       <div className="text-2xl overflow-hidden whitespace-nowrap">
         {words
           .slice(visibleRange.start, visibleRange.end)

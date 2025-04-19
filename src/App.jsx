@@ -21,26 +21,29 @@ export default function App() {
     const cleanTyped = typedWord.trim().toLowerCase();
     const cleanTarget = targetWord.trim().toLowerCase();
 
-    console.log('Checking word:', {
+    console.log("Checking word:", {
       typed: cleanTyped,
       target: cleanTarget,
       isCorrect: cleanTyped === cleanTarget,
       rawTyped: typedWord,
       rawTarget: targetWord,
-      currentWordIndex: currentWordIndexRef.current
+      currentWordIndex: currentWordIndexRef.current,
     });
 
     return cleanTyped === cleanTarget;
   };
 
   const handleMIDIInput = (char) => {
-    console.log('MIDI Input received:', { char, currentInput: inputValueRef.current });
+    console.log("MIDI Input received:", {
+      char,
+      currentInput: inputValueRef.current,
+    });
 
     if (char === "\b") {
-      setInputValue(prev => {
+      setInputValue((prev) => {
         const newValue = prev.slice(0, -1);
         inputValueRef.current = newValue;
-        console.log('Backspace:', { prev, newValue });
+        console.log("Backspace:", { prev, newValue });
         return newValue;
       });
     } else if (char === "check_word") {
@@ -48,17 +51,23 @@ export default function App() {
       const currentIndex = currentWordIndexRef.current;
 
       if (currentIndex < words.length) {
-        console.log('Space pressed:', {
+        console.log("Space pressed:", {
           currentInput,
           currentWord: words[currentIndex],
-          currentWordIndex: currentIndex
+          currentWordIndex: currentIndex,
         });
 
-        const isCorrect = checkWordCorrectness(currentInput, words[currentIndex]);
+        const isCorrect = checkWordCorrectness(
+          currentInput,
+          words[currentIndex]
+        );
 
-        setTypedWords(prev => [...prev, { word: words[currentIndex], correct: isCorrect }]);
+        setTypedWords((prev) => [
+          ...prev,
+          { word: words[currentIndex], correct: isCorrect },
+        ]);
 
-        setCurrentWordIndex(prev => {
+        setCurrentWordIndex((prev) => {
           const next = prev + 1;
           currentWordIndexRef.current = next;
           return next;
@@ -70,10 +79,10 @@ export default function App() {
         if (!isRunning) setIsRunning(true);
       }
     } else {
-      setInputValue(prev => {
+      setInputValue((prev) => {
         const newValue = prev + char;
         inputValueRef.current = newValue;
-        console.log('Character added:', { prev, char, newValue });
+        console.log("Character added:", { prev, char, newValue });
         return newValue;
       });
 
@@ -83,7 +92,7 @@ export default function App() {
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
-      const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+      const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
       return () => clearInterval(timer);
     }
 
@@ -106,9 +115,12 @@ export default function App() {
       const currentIndex = currentWordIndexRef.current;
       const isCorrect = checkWordCorrectness(inputValue, words[currentIndex]);
 
-      setTypedWords(prev => [...prev, { word: words[currentIndex], correct: isCorrect }]);
+      setTypedWords((prev) => [
+        ...prev,
+        { word: words[currentIndex], correct: isCorrect },
+      ]);
 
-      setCurrentWordIndex(prev => {
+      setCurrentWordIndex((prev) => {
         const next = prev + 1;
         currentWordIndexRef.current = next;
         return next;
@@ -120,7 +132,7 @@ export default function App() {
   };
 
   const calculateWPM = () => {
-    const correctWords = typedWords.filter(w => w.correct).length;
+    const correctWords = typedWords.filter((w) => w.correct).length;
     setWpm(correctWords);
   };
 
@@ -138,7 +150,6 @@ export default function App() {
 
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen bg-black">
-      <MIDIListener onMIDIInput={handleMIDIInput} />
       <TypingTest
         words={words}
         currentWordIndex={currentWordIndex}
@@ -154,9 +165,10 @@ export default function App() {
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyPress}
-        className="mb-4 p-2 border border-gray-400 rounded w-[50vw] text-center text-white text-4xl bg-transparent"
-        placeholder="Type here..."
+        className="mb-4 p-2 border border-gray-400 rounded w-[50vw] text-center text-white text-xl bg-transparent"
+        placeholder="Hit space to proceed to the next word"
       />
+      <MIDIListener onMIDIInput={handleMIDIInput} />
     </div>
   );
 }
