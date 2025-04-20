@@ -10,12 +10,14 @@ export default function App() {
   const inputValueRef = useRef(""); // 🔥 Real-time input tracking
   const currentWordIndexRef = useRef(0); // 🔥 Real-time word index tracking
 
-  const words = passage.split(" ");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [typedWords, setTypedWords] = useState([]);
   const [timeLeft, setTimeLeft] = useState(60);
   const [isRunning, setIsRunning] = useState(false);
   const [wpm, setWpm] = useState(null);
+
+  const [selectedPassageIndex, setSelectedPassageIndex] = useState(0);
+  const words = passage[selectedPassageIndex].split(" ");
 
   const checkWordCorrectness = (typedWord, targetWord) => {
     const cleanTyped = typedWord.trim().toLowerCase();
@@ -150,6 +152,21 @@ export default function App() {
 
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen bg-black">
+      <select
+        value={selectedPassageIndex}
+        onChange={(e) => {
+          setSelectedPassageIndex(parseInt(e.target.value));
+          resetTest(); // Reset test when changing passages
+        }}
+        className="mb-4 p-2 rounded bg-gray-800 text-white"
+      >
+        {passage.map((_, index) => (
+          <option key={index} value={index}>
+            Passage {index + 1}
+          </option>
+        ))}
+      </select>
+
       <TypingTest
         words={words}
         currentWordIndex={currentWordIndex}
